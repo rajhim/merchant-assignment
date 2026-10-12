@@ -1,0 +1,65 @@
+<div [formGroup]="group">
+  <div class="border-bottom pb-3 mb-4">
+    <h5 class="fw-bold mb-1 text-dark">Step 2: Authorized Representative</h5>
+    <p class="text-secondary small mb-0">Authorized executive or principal signatory contact.</p>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-md-6">
+      <label class="form-label small fw-semibold">Full Legal Name *</label>
+      <input 
+        type="text" 
+        class="form-control" 
+        formControlName="contactName"
+        placeholder="e.g. Dummy Contact"
+        [class.is-invalid]="isFieldInvalid('contactName')"
+      >
+      @if (isFieldInvalid('contactName')) {
+        <div class="invalid-feedback small">{{ group.get('contactName')?.errors | validationError:'Contact name' }}</div>
+      }
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label small fw-semibold">Corporate Title *</label>
+      <input 
+        type="text" 
+        class="form-control" 
+        formControlName="contactTitle"
+        placeholder="e.g. Chief Operating Officer"
+        [class.is-invalid]="isFieldInvalid('contactTitle')"
+      >
+      @if (isFieldInvalid('contactTitle')) {
+        <div class="invalid-feedback small">{{ group.get('contactTitle')?.errors | validationError:'Title' }}</div>
+      }
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label small fw-semibold">Corporate Email *</label>
+      <input 
+        type="email" 
+        class="form-control" 
+        formControlName="contactEmail"
+        placeholder="contact@dummy.internal"
+        [class.is-invalid]="isFieldInvalid('contactEmail')"
+      >
+      @if (isFieldInvalid('contactEmail')) {
+        <div class="invalid-feedback small">{{ group.get('contactEmail')?.errors | validationError:'Corporate email' }}</div>
+      }
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label small fw-semibold">Phone Number *</label>
+      <input 
+        type="tel" 
+        class="form-control font-monospace" 
+        formControlName="contactPhone"
+        placeholder="(XXX) XXX-XXXX"
+        appPhoneFormat
+        [class.is-invalid]="isFieldInvalid('contactPhone')"
+      >
+      @if (isFieldInvalid('contactPhone')) {
+        <div class="invalid-feedback small">Format must be 10 digits: (XXX) XXX-XXXX</div>
+      }
+    </div>
+  </div>
+</div>

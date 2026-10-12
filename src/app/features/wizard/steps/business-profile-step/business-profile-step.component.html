@@ -1,0 +1,89 @@
+<div [formGroup]="group">
+  <div class="border-bottom pb-3 mb-4">
+    <h5 class="fw-bold mb-1 text-dark">Step 1: Business Profile</h5>
+    <p class="text-secondary small mb-0">Legal entity registration and commercial operation details.</p>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-md-6">
+      <label class="form-label small fw-semibold">Legal Business Name *</label>
+      <input 
+        type="text" 
+        class="form-control" 
+        formControlName="businessName"
+        placeholder="e.g. Dummy Merchant LLC"
+        [class.is-invalid]="isFieldInvalid('businessName')"
+      >
+      @if (isFieldInvalid('businessName')) {
+        <div class="invalid-feedback small">{{ group.get('businessName')?.errors | validationError:'Business name' }}</div>
+      }
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label small fw-semibold">Trading Name / DBA *</label>
+      <input 
+        type="text" 
+        class="form-control" 
+        formControlName="tradingName"
+        placeholder="e.g. Dummy Store"
+        [class.is-invalid]="isFieldInvalid('tradingName')"
+      >
+      @if (isFieldInvalid('tradingName')) {
+        <div class="invalid-feedback small">{{ group.get('tradingName')?.errors | validationError:'Trading name' }}</div>
+      }
+    </div>
+
+    <div class="col-md-4">
+      <label class="form-label small fw-semibold">Entity Structure *</label>
+      <select class="form-select" formControlName="businessType">
+        <option value="LLC">Limited Liability Company (LLC)</option>
+        <option value="CORPORATION">Corporation (C-Corp / S-Corp)</option>
+        <option value="SOLE_PROPRIETORSHIP">Sole Proprietorship</option>
+        <option value="PARTNERSHIP">Partnership</option>
+      </select>
+    </div>
+
+    <div class="col-md-4">
+      <label class="form-label small fw-semibold">Tax ID / EIN *</label>
+      <input 
+        type="text" 
+        class="form-control font-monospace" 
+        formControlName="taxId"
+        placeholder="XX-XXXXXXX"
+        appTaxIdFormat
+        [class.is-invalid]="isFieldInvalid('taxId')"
+      >
+      @if (isFieldInvalid('taxId')) {
+        <div class="invalid-feedback small">Format must be 9 digits: XX-XXXXXXX</div>
+      }
+    </div>
+
+    <div class="col-md-4">
+      <label class="form-label small fw-semibold">Registration Number *</label>
+      <input 
+        type="text" 
+        class="form-control" 
+        formControlName="registrationNumber"
+        placeholder="e.g. REG-109283"
+        [class.is-invalid]="isFieldInvalid('registrationNumber')"
+      >
+      @if (isFieldInvalid('registrationNumber')) {
+        <div class="invalid-feedback small">State or national registration is required.</div>
+      }
+    </div>
+
+    <div class="col-12">
+      <label class="form-label small fw-semibold">Website / Merchant Domain *</label>
+      <input 
+        type="text" 
+        class="form-control" 
+        formControlName="websiteUrl"
+        placeholder="https://example.com"
+        [class.is-invalid]="isFieldInvalid('websiteUrl')"
+      >
+      @if (isFieldInvalid('websiteUrl')) {
+        <div class="invalid-feedback small">Please provide a valid website URL.</div>
+      }
+    </div>
+  </div>
+</div>

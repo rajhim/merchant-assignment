@@ -1,0 +1,79 @@
+<div [formGroup]="group">
+  <div class="border-bottom pb-3 mb-4">
+    <h5 class="fw-bold mb-1 text-dark">Step 4: Processing Profile & Submission</h5>
+    <p class="text-secondary small mb-0">Projected transaction volume and legal compliance agreement.</p>
+  </div>
+
+  <div class="p-3 bg-light rounded border mb-4">
+    <div class="row g-2 small text-muted">
+      <div class="col-sm-6">
+        <span class="fw-semibold text-dark">Merchant Name:</span>
+        {{ businessGroup?.get('businessName')?.value || 'Pending' }}
+      </div>
+      <div class="col-sm-6">
+        <span class="fw-semibold text-dark">Tax ID / EIN:</span>
+        {{ (businessGroup?.get('taxId')?.value | taxIdFormat) || 'Pending' }}
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-md-4">
+      <label class="form-label small fw-semibold">Estimated Monthly Volume ($) *</label>
+      <div class="input-group">
+        <span class="input-group-text">$</span>
+        <input 
+          type="number" 
+          class="form-control" 
+          formControlName="monthlyVolume"
+          [class.is-invalid]="isFieldInvalid('monthlyVolume')"
+        >
+      </div>
+      @if (isFieldInvalid('monthlyVolume')) {
+        <div class="text-danger small mt-1">{{ group.get('monthlyVolume')?.errors | validationError:'Monthly volume' }}</div>
+      }
+    </div>
+
+    <div class="col-md-4">
+      <label class="form-label small fw-semibold">Average Ticket Size ($) *</label>
+      <div class="input-group">
+        <span class="input-group-text">$</span>
+        <input 
+          type="number" 
+          class="form-control" 
+          formControlName="averageTicketSize"
+          [class.is-invalid]="isFieldInvalid('averageTicketSize')"
+        >
+      </div>
+      @if (isFieldInvalid('averageTicketSize')) {
+        <div class="text-danger small mt-1">{{ group.get('averageTicketSize')?.errors | validationError:'Average ticket' }}</div>
+      }
+    </div>
+
+    <div class="col-md-4">
+      <label class="form-label small fw-semibold">Settlement Currency *</label>
+      <select class="form-select" formControlName="currency">
+        <option value="USD">USD - United States Dollar</option>
+        <option value="EUR">EUR - Euro</option>
+        <option value="GBP">GBP - British Pound</option>
+      </select>
+    </div>
+
+    <div class="col-12 mt-4">
+      <div class="form-check p-3 bg-light rounded border">
+        <input 
+          class="form-check-input" 
+          type="checkbox" 
+          id="agreeCheck" 
+          formControlName="agreementAccepted"
+        >
+        <label class="form-check-label small" for="agreeCheck">
+          I certify that all information submitted is true, accurate, and authorized on behalf of the registered business. I consent to credit underwriting, AML checks, and KYC verification per payment association rules.
+        </label>
+      </div>
+      @if (isFieldInvalid('agreementAccepted')) {
+        <div class="text-danger small mt-1">{{ group.get('agreementAccepted')?.errors | validationError:'Agreement acceptance' }}</div>
+      }
+    </div>
+  </div>
+</div>

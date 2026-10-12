@@ -1,0 +1,51 @@
+<nav class="navbar navbar-expand-lg fin-navbar py-2 px-3">
+  <div class="container-fluid">
+    <a class="navbar-brand fin-brand me-4" routerLink="/dashboard">
+      <i class="bi bi-shield-lock-fill me-2 text-info"></i>
+      <span>Merchant Portal</span>
+    </a>
+
+    <button class="navbar-toggler text-white border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navContent">
+      <i class="bi bi-list"></i>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0 gap-1">
+        <li class="nav-item">
+          <a class="nav-link text-white-50 px-3 py-1 rounded" routerLink="/dashboard" routerLinkActive="active text-white bg-white-10">
+            <i class="bi bi-grid-1x2-fill me-1"></i> Dashboard
+          </a>
+        </li>
+
+        @if (authService.hasRole(['SALES', 'ADMIN'])) {
+          <li class="nav-item">
+            <a class="nav-link text-white-50 px-3 py-1 rounded" routerLink="/applications/new" routerLinkActive="active text-white bg-white-10">
+              <i class="bi bi-plus-circle-fill me-1"></i> New Application
+            </a>
+          </li>
+        }
+      </ul>
+
+      <div class="d-flex align-items-center gap-3">
+        @if (authService.isAuthenticated()) {
+          <div class="d-flex align-items-center text-white">
+            <div class="avatar bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px; font-size: 0.8rem; font-weight: 600;">
+              {{ (authService.currentUser().username || authService.currentUser().name).charAt(0).toUpperCase() }}
+            </div>
+            <div class="d-none d-md-block text-start me-2" style="line-height: 1.2;">
+              <div class="fw-semibold small">{{ authService.currentUser().name || authService.currentUser().username }}</div>
+              <div class="text-white-50" style="font-size: 0.7rem;">{{ authService.currentUser().role }}</div>
+            </div>
+            <button class="btn btn-outline-light btn-sm py-1 px-2" (click)="authService.logout()" title="Sign Out">
+              <i class="bi bi-box-arrow-right"></i>
+            </button>
+          </div>
+        } @else {
+          <a routerLink="/login" class="btn btn-outline-light btn-sm">
+            <i class="bi bi-box-arrow-in-right me-1"></i> Sign In
+          </a>
+        }
+      </div>
+    </div>
+  </div>
+</nav>

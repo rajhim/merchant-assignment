@@ -1,0 +1,22 @@
+services:
+  api:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: payment-api
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+    restart: unless-stopped
+
+  client:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: payment-client
+    ports:
+      - "4200:80"
+    depends_on:
+      - api
+    restart: unless-stopped

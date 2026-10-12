@@ -1,0 +1,121 @@
+<div class="container-fluid py-4 px-lg-5">
+  <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
+    <div>
+      <div class="d-flex align-items-center gap-2 mb-1">
+        <a routerLink="/dashboard" class="btn btn-sm btn-outline-secondary py-0 px-2">
+          <i class="bi bi-arrow-left"></i>
+        </a>
+        <h2 class="fw-bold mb-0 text-dark">
+          {{ applicationId() ? 'Edit Merchant Application' : 'New Merchant Application' }}
+        </h2>
+        @if (applicationId()) {
+          <span class="badge bg-secondary font-monospace">{{ applicationId() }}</span>
+        }
+      </div>
+      <p class="text-secondary small mb-0">
+        Complete merchant underwriting questionnaire for payment acquiring settlement.
+      </p>
+    </div>
+
+    <div class="d-flex align-items-center gap-3">
+      <div class="d-flex align-items-center gap-2 text-muted small bg-white border rounded px-3 py-1 shadow-sm">
+        @if (autoSaveStatus().toLowerCase().includes('saving')) {
+          <div class="spinner-border text-primary spinner-border-sm" role="status"></div>
+        } @else {
+          <i class="bi bi-cloud-check text-success fs-6"></i>
+        }
+        <span>{{ autoSaveStatus() }}</span>
+      </div>
+
+      <button class="btn btn-outline-secondary btn-sm" (click)="manualSaveDraft()">
+        <i class="bi bi-save me-1"></i> Save Draft
+      </button>
+    </div>
+  </div>
+
+  @if (autoSaveError()) {
+    <div class="alert alert-danger py-2 px-3 small d-flex align-items-center justify-content-between mb-4">
+      <div><i class="bi bi-exclamation-triangle-fill me-2"></i>{{ autoSaveError() }}</div>
+      <button class="btn-close btn-sm" (click)="autoSaveError.set(null)"></button>
+    </div>
+  }
+
+  <div class="fin-card mb-4">
+    <div class="fin-card-body p-0">
+      <div class="row g-0 wizard-steps-bar">
+        @for (step of steps; track step.number) {
+          <div 
+            class="col-md-3 wizard-step-item p-3 border-end" 
+            [class.active]="currentStep() === step.number"
+            [class.completed]="currentStep() > step.number"
+            (click)="goToStep(step.number)"
+          >
+            <div class="d-flex align-items-center gap-3">
+              <div class="step-badge rounded-circle d-flex align-items-center justify-content-center fw-bold">
+                @if (currentStep() > step.number) {
+                  <i class="bi bi-check-lg"></i>
+                } @else {
+                  {{ step.number }}
+                }
+              </div>
+              <div style="line-height: 1.2;">
+                <div class="fw-bold text-dark small">{{ step.title }}</div>
+                <div class="text-muted" style="font-size: 0.72rem;">{{ step.desc }}</div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <form [formGroup]="applicationForm" (ngSubmit)="submitApplication()">
+    <div class="fin-card p-4 mb-4">
+      @if (currentStep() === 1) {
+        <app-business-profile-step [group]="businessGroup" />
+      }
+
+      @if (currentStep() === 2) {
+        <app-contact-info-step [group]="contactGroup" />
+      }
+
+      @if (currentStep() === 3) {
+        <app-banking-info-step [group]="bankingGroup" />
+      }
+
+      @if (currentStep() === 4) {
+        <app-processing-review-step [group]="processingGroup" [businessGroup]="businessGroup" />
+      }
+
+      <div class="d-flex justify-content-between align-items-center pt-3 border-top mt-4">
+        <div>
+          @if (currentStep() > 1) {
+            <button type="button" class="btn btn-outline-secondary" (click)="prevStep()">
+              <i class="bi bi-arrow-left me-1"></i> Previous
+            </button>
+          }
+        </div>
+
+        <div class="d-flex gap-2">
+          @if (currentStep() < totalSteps) {
+            <button type="button" class="btn fin-btn-primary" (click)="nextStep()">
+              Continue <i class="bi bi-arrow-right ms-1"></i>
+            </button>
+          } @else {
+            <button 
+              type="submit" 
+              class="btn btn-success px-4 fw-semibold"
+              [disabled]="isSubmitting() || applicationForm.invalid"
+            >
+              @if (isSubmitting()) {
+                <span class="spinner-border spinner-border-sm me-1" role="status"></span> Submitting...
+              } @else {
+                <i class="bi bi-send-check-fill me-1"></i> Submit for Underwriting
+              }
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

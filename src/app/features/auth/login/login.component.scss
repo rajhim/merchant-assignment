@@ -1,0 +1,25 @@
+.login-wrapper {
+  min-height: calc(100vh - 70px);
+  background: radial-gradient(circle at top right, #f1f5f9 0%, #e2e8f0 100%);
+}
+
+.login-card-container {
+  width: 100%;
+  max-width: 460px;
+}
+
+.brand-logo-pill {
+  background: linear-gradient(135deg, #0b132b 0%, #1c2541 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 12px rgba(11, 19, 43, 0.2);
+}
+
+.preset-btn {
+  transition: all 0.2s ease;
+  &:hover {
+    border-color: #3b82f6 !important;
+    background-color: #f8fafc !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05) !important;
+  }
+}

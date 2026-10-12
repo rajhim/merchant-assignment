@@ -1,0 +1,40 @@
+.wizard-steps-bar {
+  background: #ffffff;
+}
+
+.wizard-step-item {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+
+  &:hover {
+    background-color: #f8fafc;
+  }
+
+  &.active {
+    background-color: #eff6ff;
+    border-bottom: 2px solid #2563eb;
+
+    .step-badge {
+      background-color: #2563eb;
+      color: #ffffff;
+    }
+  }
+
+  &.completed {
+    .step-badge {
+      background-color: #10b981;
+      color: #ffffff;
+    }
+  }
+}
+
+.step-badge {
+  width: 32px;
+  height: 32px;
+  background-color: #e2e8f0;
+  color: #64748b;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}

@@ -1,0 +1,290 @@
+<div class="container-fluid py-4 px-lg-5">
+  @if (realtimeNotification(); as event) {
+    <div class="alert alert-primary alert-dismissible fade show d-flex align-items-center justify-content-between shadow-sm mb-4" role="alert">
+      <div class="d-flex align-items-center gap-2">
+        <i class="bi" [class.bi-person-check-fill]="event.type === 'ASSIGNMENT'" [class.bi-broadcast]="event.type !== 'ASSIGNMENT'"></i>
+        <span>
+          @if (event.type === 'ASSIGNMENT') {
+            <strong>Assignment Notification:</strong> Application <strong>{{ event.applicationId }}</strong> ({{ event.businessName }}) has been successfully assigned to <strong>{{ event.assignedReviewerName }}</strong> at {{ event.timestamp }}.
+          } @else {
+            <strong>Real-Time Update:</strong> {{ event.businessName }} ({{ event.applicationId }}) transitioned from 
+            <span class="badge bg-secondary">{{ event.previousStatus }}</span> to 
+            <span class="badge bg-success">{{ event.newStatus }}</span> at {{ event.timestamp }}.
+          }
+        </span>
+      </div>
+      <button type="button" class="btn-close" (click)="dismissNotification()" aria-label="Close"></button>
+    </div>
+  }
+
+  <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
+    <div>
+      <h2 class="fw-bold mb-1 text-dark">Merchant Applications</h2>
+      <p class="text-secondary small mb-0">
+        Review underwriting, manage onboardings, and track underwriting pipelines.
+      </p>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+      <button class="btn btn-outline-secondary btn-sm" (click)="retry()" [disabled]="isLoading()">
+        <i class="bi bi-arrow-clockwise me-1" [class.spin]="isLoading()"></i> Refresh
+      </button>
+      @if (authService.hasRole(['SALES', 'ADMIN'])) {
+        <a routerLink="/applications/new" class="btn fin-btn-primary btn-sm">
+          <i class="bi bi-plus-lg me-1"></i> New Merchant
+        </a>
+      }
+    </div>
+  </div>
+
+  @if (statusCounts(); as counts) {
+    <div class="row g-3 mb-4">
+      <div class="col-6 col-md-4 col-xl-2">
+        <div class="fin-stat-card blue cursor-pointer" [class.border-primary]="statusFilter() === 'ALL'" [class.border-2]="statusFilter() === 'ALL'" (click)="onStatusChange('ALL')">
+          <div class="text-secondary small fw-semibold text-uppercase">Total Permitted</div>
+          <div class="fs-3 fw-bold text-dark mt-1">{{ counts.total }}</div>
+          <div class="small text-muted mt-1">All pipelines</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-4 col-xl-2">
+        <div class="fin-stat-card cursor-pointer" [class.border-secondary]="statusFilter() === 'DRAFT'" [class.border-2]="statusFilter() === 'DRAFT'" (click)="onStatusChange('DRAFT')">
+          <div class="text-secondary small fw-semibold text-uppercase">Drafts</div>
+          <div class="fs-3 fw-bold text-secondary mt-1">{{ counts.draft }}</div>
+          <div class="small text-muted mt-1">In progress</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-4 col-xl-2">
+        <div class="fin-stat-card indigo cursor-pointer" [class.border-primary]="statusFilter() === 'SUBMITTED'" [class.border-2]="statusFilter() === 'SUBMITTED'" (click)="onStatusChange('SUBMITTED')">
+          <div class="text-secondary small fw-semibold text-uppercase">Submitted</div>
+          <div class="fs-3 fw-bold text-primary mt-1">{{ counts.submitted }}</div>
+          <div class="small text-muted mt-1">Pending assignment</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-4 col-xl-2">
+        <div class="fin-stat-card amber cursor-pointer" [class.border-warning]="statusFilter() === 'UNDER_REVIEW'" [class.border-2]="statusFilter() === 'UNDER_REVIEW'" (click)="onStatusChange('UNDER_REVIEW')">
+          <div class="text-secondary small fw-semibold text-uppercase">Under Review</div>
+          <div class="fs-3 fw-bold text-warning mt-1">{{ counts.underReview }}</div>
+          <div class="small text-muted mt-1">Active risk check</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-4 col-xl-2">
+        <div class="fin-stat-card emerald cursor-pointer" [class.border-success]="statusFilter() === 'APPROVED'" [class.border-2]="statusFilter() === 'APPROVED'" (click)="onStatusChange('APPROVED')">
+          <div class="text-secondary small fw-semibold text-uppercase">Approved</div>
+          <div class="fs-3 fw-bold text-success mt-1">{{ counts.approved }}</div>
+          <div class="small text-muted mt-1">Ready to process</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-4 col-xl-2">
+        <div class="fin-stat-card rose cursor-pointer" [class.border-danger]="statusFilter() === 'REJECTED'" [class.border-2]="statusFilter() === 'REJECTED'" (click)="onStatusChange('REJECTED')">
+          <div class="text-secondary small fw-semibold text-uppercase">Rejected</div>
+          <div class="fs-3 fw-bold text-danger mt-1">{{ counts.rejected }}</div>
+          <div class="small text-muted mt-1">Declined risk</div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <div class="fin-card">
+    <div class="fin-card-header flex-wrap gap-3">
+      <div class="d-flex align-items-center flex-grow-1 gap-2" style="max-width: 400px;">
+        <div class="input-group input-group-sm">
+          <span class="input-group-text bg-light border-end-0 text-muted">
+            <i class="bi bi-search"></i>
+          </span>
+          <input 
+            type="text" 
+            class="form-control bg-light border-start-0" 
+            placeholder="Search business, DBA, ID, email..."
+            [value]="searchQuery()"
+            (input)="onSearchInput($event)"
+          >
+        </div>
+      </div>
+
+      <div class="d-flex align-items-center gap-2 flex-wrap">
+        <div class="d-flex align-items-center">
+          <span class="small text-muted me-2">Status:</span>
+          <select 
+            class="form-select form-select-sm" 
+            style="width: 140px;"
+            [value]="statusFilter()"
+            (change)="onStatusChange($any($event.target).value)"
+          >
+            <option value="ALL">All Statuses</option>
+            <option value="DRAFT">Draft</option>
+            <option value="SUBMITTED">Submitted</option>
+            <option value="UNDER_REVIEW">Under Review</option>
+            <option value="APPROVED">Approved</option>
+            <option value="REJECTED">Rejected</option>
+          </select>
+        </div>
+
+        <div class="d-flex align-items-center">
+          <span class="small text-muted me-2">Entity:</span>
+          <select 
+            class="form-select form-select-sm" 
+            style="width: 150px;"
+            [value]="businessTypeFilter()"
+            (change)="onBusinessTypeChange($any($event.target).value)"
+          >
+            <option value="ALL">All Types</option>
+            <option value="LLC">LLC</option>
+            <option value="CORPORATION">Corporation</option>
+            <option value="SOLE_PROPRIETORSHIP">Sole Proprietorship</option>
+            <option value="PARTNERSHIP">Partnership</option>
+          </select>
+        </div>
+
+        <div class="d-flex align-items-center">
+          <span class="small text-muted me-2">Rows:</span>
+          <select 
+            class="form-select form-select-sm" 
+            style="width: 75px;"
+            [value]="pageSize()"
+            (change)="onPageSizeChange(+$any($event.target).value)"
+          >
+            <option [value]="5">5</option>
+            <option [value]="10">10</option>
+            <option [value]="25">25</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    @if (hasError()) {
+      <div class="p-5 text-center">
+        <div class="text-danger mb-2">
+          <i class="bi bi-exclamation-triangle-fill fs-2"></i>
+        </div>
+        <h5 class="fw-bold mb-1">Failed to load data</h5>
+        <p class="text-muted small mb-3">{{ errorMessage() }}</p>
+        <button class="btn btn-outline-primary btn-sm" (click)="retry()">
+          <i class="bi bi-arrow-clockwise me-1"></i> Retry Request
+        </button>
+      </div>
+    } @else if (isLoading()) {
+      <div class="p-5 text-center text-muted">
+        <div class="spinner-border text-primary spinner-border-sm mb-2" role="status"></div>
+        <div class="small">Querying merchant application ledger...</div>
+      </div>
+    } @else if (applications().length === 0) {
+      <div class="p-5 text-center text-muted">
+        <i class="bi bi-folder2-open fs-1 text-secondary mb-2 d-block"></i>
+        <h6 class="fw-bold text-dark mb-1">No merchant applications found</h6>
+        <p class="small text-secondary mb-3">No matching records match the selected role permissions and criteria.</p>
+        @if (authService.hasRole(['SALES', 'ADMIN'])) {
+          <a routerLink="/applications/new" class="btn fin-btn-primary btn-sm">
+            <i class="bi bi-plus-lg me-1"></i> Start New Application
+          </a>
+        }
+      </div>
+    } @else {
+      <div class="table-responsive">
+        <table class="fin-table">
+          <thead>
+            <tr>
+              <th>Application ID</th>
+              <th>Merchant & Trading Name</th>
+              <th>Entity Type</th>
+              <th>Est. Volume</th>
+              <th>Status</th>
+              <th>Assigned Reviewer</th>
+              <th>Created By</th>
+              <th>Created Date</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (app of applications(); track app.id) {
+              <tr>
+                <td>
+                  <span class="font-monospace fw-semibold text-primary small">{{ app.id }}</span>
+                </td>
+                <td>
+                  <div class="fw-semibold text-dark">{{ app.businessName }}</div>
+                  @if (app.tradingName && app.tradingName !== app.businessName) {
+                    <div class="text-muted small">DBA: {{ app.tradingName }}</div>
+                  }
+                </td>
+                <td>
+                  <span class="badge bg-light text-dark border">{{ app.businessType }}</span>
+                </td>
+                <td>
+                  <div class="fw-semibold text-dark">${{ app.monthlyVolume | number }}</div>
+                  <div class="text-muted small">${{ app.averageTicketSize | number }} avg</div>
+                </td>
+                <td>
+                  <span class="badge px-2 py-1 rounded-pill {{ getStatusBadgeClass(app.status) }}">
+                    {{ app.status }}
+                  </span>
+                  @if (app.status === 'DRAFT' && app.currentStep) {
+                    <div class="small text-muted mt-1">Step {{ app.currentStep }} of 4</div>
+                  }
+                </td>
+                <td>
+                  @if (authService.hasRole(['ADMIN'])) {
+                    <div class="d-flex align-items-center gap-1">
+                      <select 
+                        class="form-select form-select-sm py-0 px-2" 
+                        style="width: 160px; font-size: 0.75rem; height: 28px;"
+                        [value]="app.assignedReviewerId || ''"
+                        (change)="onAssignReviewer(app, $any($event.target).value)"
+                        [disabled]="assigningAppId() === app.id"
+                      >
+                        <option value="" disabled [selected]="!app.assignedReviewerId">Select Reviewer...</option>
+                        <option value="reviewer">Risk Underwriter 1</option>
+                        <option value="reviewer2">Risk Underwriter 2</option>
+                        <option value="reviewer3">Risk Underwriter 3</option>
+                      </select>
+                      @if (assigningAppId() === app.id) {
+                        <span class="spinner-border spinner-border-sm text-primary" style="width: 0.8rem; height: 0.8rem;"></span>
+                      }
+                    </div>
+                  } @else {
+                    @if (app.assignedReviewerName) {
+                      <span class="small text-dark">
+                        <i class="bi bi-person-check me-1 text-success"></i>{{ app.assignedReviewerName }}
+                      </span>
+                    } @else {
+                      <span class="small text-muted italic">Unassigned</span>
+                    }
+                  }
+                </td>
+                <td>
+                  <span class="small text-secondary">{{ app.createdByName }}</span>
+                </td>
+                <td>
+                  <span class="small text-secondary text-nowrap">{{ app.createdAt | date:'mediumDate' }}</span>
+                </td>
+                <td class="text-end">
+                  <div class="btn-group btn-group-sm">
+                    @if (app.status === 'DRAFT' && authService.hasRole(['SALES', 'ADMIN'])) {
+                      <a [routerLink]="['/applications', app.id, 'edit']" class="btn btn-outline-primary">
+                        <i class="bi bi-pencil-square me-1"></i> Edit
+                      </a>
+                    }
+                    <a [routerLink]="['/applications', app.id]" class="btn btn-outline-secondary">
+                      @if (authService.hasRole(['REVIEWER', 'ADMIN']) && (app.status === 'SUBMITTED' || app.status === 'UNDER_REVIEW')) {
+                        <i class="bi bi-shield-check text-warning me-1"></i> Review
+                      } @else {
+                        <i class="bi bi-eye me-1"></i> Details
+                      }
+                    </a>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <app-pagination
+        [page]="page()"
+        [pageSize]="pageSize()"
+        [totalCount]="totalCount()"
+        [totalPages]="totalPages()"
+        [currentCount]="applications().length"
+        (pageChange)="goToPage($event)"
+      ></app-pagination>
+    }
+  </div>
+</div>

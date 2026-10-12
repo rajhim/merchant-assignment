@@ -1,0 +1,110 @@
+<div class="login-wrapper d-flex align-items-center justify-content-center py-5 px-3">
+  <div class="login-card-container">
+    <div class="text-center mb-4">
+      <div class="brand-logo-pill d-inline-flex align-items-center gap-2 px-3 py-2 rounded-pill mb-3">
+        <i class="bi bi-shield-lock-fill text-info fs-4"></i>
+        <span class="fs-4 fw-bold text-white">Merchant <span class="text-info">Portal</span></span>
+      </div>
+      <h2 class="fw-bold text-dark mb-1">Merchant Portal</h2>
+      <p class="text-muted small">Access role-gated merchant onboarding and underwriting risk tools</p>
+    </div>
+
+    @if (errorMessage()) {
+      <div class="alert alert-danger d-flex align-items-center gap-2 py-2 px-3 mb-4 rounded-3" role="alert">
+        <i class="bi bi-exclamation-circle-fill"></i>
+        <span class="small">{{ errorMessage() }}</span>
+      </div>
+    }
+
+    <div class="card fin-card shadow-sm border-0 mb-4">
+      <div class="card-body p-4">
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+          <div class="mb-3">
+            <label class="form-label small fw-semibold text-dark">Username</label>
+            <div class="input-group">
+              <span class="input-group-text bg-light border-end-0 text-muted">
+                <i class="bi bi-person"></i>
+              </span>
+              <input 
+                type="text" 
+                class="form-control border-start-0" 
+                placeholder="sales, reviewer, or admin" 
+                formControlName="username"
+                [class.is-invalid]="loginForm.get('username')?.touched && loginForm.get('username')?.invalid"
+              >
+            </div>
+            @if (loginForm.get('username')?.touched && loginForm.get('username')?.invalid) {
+              <div class="text-danger small mt-1">Username is required.</div>
+            }
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label small fw-semibold text-dark">Password</label>
+            <div class="input-group">
+              <span class="input-group-text bg-light border-end-0 text-muted">
+                <i class="bi bi-key"></i>
+              </span>
+              <input 
+                type="password" 
+                class="form-control border-start-0" 
+                placeholder="••••••••" 
+                formControlName="password"
+                [class.is-invalid]="loginForm.get('password')?.touched && loginForm.get('password')?.invalid"
+              >
+            </div>
+            @if (loginForm.get('password')?.touched && loginForm.get('password')?.invalid) {
+              <div class="text-danger small mt-1">Password is required.</div>
+            }
+          </div>
+
+          <button 
+            type="submit" 
+            class="btn fin-btn-primary w-100 py-2 d-flex align-items-center justify-content-center gap-2 fw-semibold"
+            [disabled]="isLoading()"
+          >
+            @if (isLoading()) {
+              <div class="spinner-border spinner-border-sm" role="status"></div>
+              <span>Signing In...</span>
+            } @else {
+              <span>Authenticate & Enter Portal</span>
+              <i class="bi bi-arrow-right"></i>
+            }
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div class="preset-section">
+      <div class="d-flex align-items-center gap-2 mb-3">
+        <hr class="flex-grow-1 text-muted">
+        <span class="small text-muted fw-semibold text-uppercase" style="letter-spacing: 0.5px; font-size: 0.75rem;">
+          One-Click Role Profiles
+        </span>
+        <hr class="flex-grow-1 text-muted">
+      </div>
+
+      <div class="row g-2">
+        @for (user of presetUsers; track user.id) {
+          <div class="col-12 col-sm-4">
+            <button 
+              type="button" 
+              class="btn btn-outline-light w-100 p-2 text-start preset-btn border bg-white shadow-sm"
+              (click)="selectPreset(user)"
+              [disabled]="isLoading()"
+            >
+              <div class="d-flex align-items-center justify-content-between mb-1">
+                <span class="fw-bold small text-dark">{{ user.username }}</span>
+                <span class="badge {{ getRoleBadgeClass(user.role) }}" style="font-size: 0.65rem;">
+                  {{ user.role }}
+                </span>
+              </div>
+              <div class="text-muted text-truncate" style="font-size: 0.75rem;">
+                password: {{ user.username }}
+              </div>
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>

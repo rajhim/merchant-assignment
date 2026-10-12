@@ -1,0 +1,63 @@
+<div [formGroup]="group">
+  <div class="border-bottom pb-3 mb-4">
+    <h5 class="fw-bold mb-1 text-dark">Step 3: Settlement Bank Account</h5>
+    <p class="text-secondary small mb-0">Financial institution where daily credit card settlements are cleared.</p>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-md-6">
+      <label class="form-label small fw-semibold">Financial Institution Name *</label>
+      <input 
+        type="text" 
+        class="form-control" 
+        formControlName="bankName"
+        placeholder="e.g. JPMorgan Chase Bank"
+        [class.is-invalid]="isFieldInvalid('bankName')"
+      >
+      @if (isFieldInvalid('bankName')) {
+        <div class="invalid-feedback small">{{ group.get('bankName')?.errors | validationError:'Bank name' }}</div>
+      }
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label small fw-semibold">Account Type *</label>
+      <select class="form-select" formControlName="accountType">
+        <option value="CHECKING">Commercial Checking</option>
+        <option value="SAVINGS">Business Savings</option>
+      </select>
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label small fw-semibold">Routing Number (ABA) *</label>
+      <input 
+        type="text" 
+        class="form-control font-monospace" 
+        formControlName="routingNumber"
+        placeholder="9-digit routing"
+        maxlength="9"
+        appNumericOnly
+        [maxDigits]="9"
+        [class.is-invalid]="isFieldInvalid('routingNumber')"
+      >
+      @if (isFieldInvalid('routingNumber')) {
+        <div class="invalid-feedback small">Routing number must be exactly 9 digits.</div>
+      }
+    </div>
+
+    <div class="col-md-6">
+      <label class="form-label small fw-semibold">Account Number *</label>
+      <input 
+        type="password" 
+        class="form-control font-monospace" 
+        formControlName="bankAccountNumber"
+        placeholder="8 to 17 digits"
+        appNumericOnly
+        [maxDigits]="17"
+        [class.is-invalid]="isFieldInvalid('bankAccountNumber')"
+      >
+      @if (isFieldInvalid('bankAccountNumber')) {
+        <div class="invalid-feedback small">Account number must be 8-17 digits.</div>
+      }
+    </div>
+  </div>
+</div>

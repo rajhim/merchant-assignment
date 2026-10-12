@@ -1,0 +1,33 @@
+<div class="p-3 border-top d-flex flex-column flex-sm-row align-items-center justify-content-between gap-2">
+  <div class="small text-muted">
+    Showing <strong>{{ startEntry() }}</strong> to 
+    <strong>{{ endEntry() }}</strong> of 
+    <strong>{{ totalCount() }}</strong> entries
+  </div>
+
+  <nav aria-label="Pagination">
+    <ul class="pagination pagination-sm mb-0">
+      <li class="page-item" [class.disabled]="page() <= 1">
+        <button class="page-link" (click)="goToPage(1)" [disabled]="page() <= 1" title="First page">
+          <i class="bi bi-chevron-double-left"></i>
+        </button>
+      </li>
+      <li class="page-item" [class.disabled]="page() <= 1">
+        <button class="page-link" (click)="goToPage(page() - 1)" [disabled]="page() <= 1">Previous</button>
+      </li>
+      @for (p of pages(); track p) {
+        <li class="page-item" [class.active]="page() === p">
+          <button class="page-link" (click)="goToPage(p)">{{ p }}</button>
+        </li>
+      }
+      <li class="page-item" [class.disabled]="page() >= totalPages()">
+        <button class="page-link" (click)="goToPage(page() + 1)" [disabled]="page() >= totalPages()">Next</button>
+      </li>
+      <li class="page-item" [class.disabled]="page() >= totalPages()">
+        <button class="page-link" (click)="goToPage(totalPages())" [disabled]="page() >= totalPages()" title="Last page">
+          <i class="bi bi-chevron-double-right"></i>
+        </button>
+      </li>
+    </ul>
+  </nav>
+</div>
